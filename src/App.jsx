@@ -1,7 +1,6 @@
-import react, { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import React from "react";
 import Login from "./Pages/Login";
 import Sign from "./Pages/sign";
 import Home from "./Pages/Home";
@@ -10,25 +9,27 @@ import Player from "./components/Player";
 import { auth } from "./firebase";
 import { ToastContainer, toast } from 'react-toastify';
 import { onAuthStateChanged } from "firebase/auth";
-import Titlecards from "./components/Titlecards";
+
 const App = () => {
-  const navi = useNavigate()
+  const navi = useNavigate();
+
   useEffect(() => {
-    onAuthStateChanged(auth,async (user)=>{
-      if(user){
-        toast.success("Successfully logined")
-        navi('/')
-      }else{
-        
-        navi('/login')
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        toast.success("Successfully logged in", { autoClose: 1500 });
+        navi('/');
+      } else {
+        navi('/login');
       }
-    })
-  }, []);
+    });
+
+    return () => unsubscribe(); // Cleanup function
+  }, [navi]); // Added `navi` in dependency array
+
   return (
-    <div className="">
+    <div>
       <ToastContainer theme="dark" />
       <Routes>
-        
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/sign" element={<Sign />} />
